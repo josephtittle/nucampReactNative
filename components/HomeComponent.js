@@ -41,16 +41,6 @@ function RenderItem(props) {
 }
 
 class Home extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            campsites: CAMPSITES,
-            promotions: PROMOTIONS,
-            partners: PARTNERS
-        };
-    }
-
     static navigationOptions = {
         title: 'Home'
     }
