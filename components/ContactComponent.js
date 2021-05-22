@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Card } from 'react-native-elements';
-import { View, Text, ScrollView } from 'react-native';
+import { Text, ScrollView } from 'react-native';
 
 
 
