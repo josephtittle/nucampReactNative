@@ -1,7 +1,16 @@
-import { PARTNERS } from '../shared/partners';
 import React, { Component } from 'react';
 import { Card, ListItem } from 'react-native-elements';
 import { Text, ScrollView, FlatList } from 'react-native';
+import { connect } from 'react-redux';
+import { baseUrl } from '../shared/baseUrl';
+import Loading from './LoadingComponent';
+
+const mapStateToProps = state => {
+    return {
+        partners: state.partners
+    };
+};
+
 
 class Mission extends Component {
     render() {
@@ -17,28 +26,44 @@ class Mission extends Component {
 }
 
 class About extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            partners: PARTNERS
-        }
-    }
 
     static navigationOptions = {
         title: 'About Us'
     }
 
     render() {
-        const renderPartners = ({ item }) => {
+        const renderPartner = ({item}) => {
             return (
                 <ListItem
                     title={item.name}
                     subtitle={item.description}
-                    leftAvatar={{ source: require('./images/bootstrap-logo.png') }}
+                    leftAvatar={{source: {uri: baseUrl + item.image}}}
                 />
             );
         };
 
+        if (this.props.partners.isLoading) {
+            return (
+                <ScrollView>
+                    <Mission />
+                    <Card
+                        title='Community Partners'>
+                        <Loading />
+                    </Card>
+                </ScrollView>
+            );
+        }
+        if (this.props.partners.errMess) {
+            return (
+                <ScrollView>
+                    <Mission />
+                    <Card
+                        title='Community Partners'>
+                        <Text>{this.props.partners.errMess}</Text>
+                    </Card>
+                </ScrollView>
+            );
+        }
         return (
             <ScrollView>
                 <Mission />
@@ -49,16 +74,15 @@ class About extends Component {
                     }}>
                         Community Partners
                     </Text>
-                    <FlatList
-                        data={this.state.partners}
-                        renderItem={renderPartners}
-                        keyExtractor={item => item.id.toString()} />
+                    <FlatList 
+                        data={this.props.partners.partners}
+                        renderItem={renderPartner}
+                        keyExtractor={item => item.id.toString()}
+                    />
                 </Card>
             </ScrollView>
         );
     }
 }
 
-
-
-export default About;
+export default connect(mapStateToProps)(About);
