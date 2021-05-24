@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Text, View, ScrollView, FlatList, StyleSheet, Modal, Button } from 'react-native'
-import { Card, Icon } from 'react-native-elements';
+import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 //import { CAMPSITES } from '../shared/campsites' ---- removed when added redux to fetch via json-server ------
 //import { COMMENTS } from '../shared/comments' ---- removed when added redux to fetch via json-server ------
 import { baseUrl } from '../shared/baseUrl';
-import { postFavorite } from '../redux/ActionCreators';
+import { postFavorite, postComment } from '../redux/ActionCreators';
 
 const mapStateToProps = state => {
     return {
@@ -16,7 +16,8 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = {
-    postFavorite: campsiteId => (postFavorite(campsiteId))
+    postFavorite: campsiteId => (postFavorite(campsiteId)),
+    postComment: (campsiteId, rating, author, text) => (postComment(campsiteId, rating, author, text))
 };
 
 // use the property of the campsite object so can destructure
@@ -39,8 +40,7 @@ function RenderCampsite(props) {
                     color='#f50'
                     raised
                     reverse
-                    onPress={() => props.favorite ? 
-                        console.log('Already set as a favorite') : props.markFavorite()}
+                    onPress={() => props.favorite ? console.log(`Already set as a favorite`) : props.markFavorite()}
                 />
                 <Icon
                     name={'pencil'}
@@ -63,7 +63,12 @@ function RenderComments({comments}) {
         return (
             <View style={{margin: 10}}>
                 <Text style={{fontSize: 14}}>{item.text}</Text>
-                <Text style={{fontSize: 12}}>{item.rating} Stars</Text>
+                <Rating
+                    startingValue={item.rating}
+                    imageSize={10}
+                    style={{alignItems: 'flex-start', paddingVertical: '5%'}}
+                    read-only
+                />
                 <Text style={{fontSize: 12}}>{`-- ${item.author}, ${item.date}`}</Text>
             </View>
         );
@@ -99,11 +104,12 @@ class CampsiteInfo extends Component {
     }
 
     handleComment(campsiteId) {
+        // console.log(JSON.stringify(this.state));
         this.props.postComment(campsiteId, this.state.rating, this.state.author, this.state.text, )
         this.toggleModal()
     }
     // will now need to pass this event handler as one of the props from the CampsiteInfo component to the RenderCampsite component.
-
+    // using resetform method in the reservation component for guide to set up reset form in this modal
     resetForm() {
         this.setState({
             showModal: false,
@@ -130,7 +136,7 @@ class CampsiteInfo extends Component {
                 <RenderCampsite campsite={campsite}
                     favorite={this.props.favorites.includes(campsiteId)}
                     // returns boolean if array includes the favorited campsite id then pass value to RenderCampsite component
-                    markFavorite={() => this.markFavorite()}
+                    markFavorite={() => this.markFavorite(campsiteId)}
                     onShowModal={() => this.toggleModal()}
                     // Add the Modal: Set up Modal component that will allow you to add comments to a campsite. Use the Modal from the Reservation component as guide
                     // use the same animationType, transparent, visible, and onRequestClose props. Add it just before the end of the Scrollview component in the CampsiteInfo component. 
@@ -143,16 +149,37 @@ class CampsiteInfo extends Component {
                     onRequestClose={() => this.toggleModal()}
                 >
                     <View style={styles.modal}>
-                        {/* <Text style={styles.modalTitle}>Search Campsite Reservations</Text>
-                        <Text style={styles.modalText}>
-                            Number of Campers: {this.state.campers}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Hike-In?: {this.state.hikeIn ? 'Yes' : 'No'}
-                        </Text>
-                        <Text style={styles.modalText}>
-                            Date: {this.state.date.toLocaleDateString('en-US')}
-                        </Text> */}
+                    <Rating
+                            showRating
+                            startingValue={this.state.rating}
+                            imageSize={40}
+                            onFinishRating={rating => this.setState({rating: rating})}
+                            style={{paddingVertical: 10}}
+                        />
+                        <Input 
+                            placeholder='Author'
+                            leftIcon={{ type: 'font-awesome', name: 'user-o' }}
+                            leftIconContainerStyle= {{paddingRight: 10}}
+                            onChangeText={author => this.setState({author: author})}
+                            value={this.state.author}
+                        />
+                        <Input 
+                            placeholder='Comment'
+                            leftIcon={{ type: 'font-awesome', name: 'comment-o' }}
+                            leftIconContainerStyle= {{paddingRight: 10}}
+                            onChangeText={text => this.setState({text: text})}
+                            value={this.state.text}
+                        />
+                        <View style={{margin: 10}}>
+                            <Button
+                                onPress={() => {
+                                    this.handleComment(campsiteId)
+                                    this.resetForm()
+                                }}
+                                color='#5637DD'
+                                title='Submit'
+                            />
+                        </View>
                         <View style={{margin: 10}}>
                         <Button
                             onPress={() => {

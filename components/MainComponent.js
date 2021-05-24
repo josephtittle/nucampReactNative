@@ -57,7 +57,6 @@ const DirectoryNavigator = createStackNavigator(
                 />
             })
         },
-
         CampsiteInfo: { screen: CampsiteInfo }
     },
     {

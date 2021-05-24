@@ -26,9 +26,32 @@ export const commentsFailed = errMess => ({
     payload: errMess
 });
 
+
+// add comments is more like get comments that are pre-existing vs add comment is adding the comment being created
 export const addComments = comments => ({
     type: ActionTypes.ADD_COMMENTS,
     payload: comments
+});
+
+
+// thunked action creator postComment to post comment added within the modal
+export const postComment = (campsiteId, rating, author, text) => dispatch => {
+    const newComment = {
+        campsiteId,
+        rating,
+        author,
+        text
+    }
+    newComment.date = new Date().toISOString() // no method in newComment 
+    setTimeout(() => {
+        dispatch(addComment(newComment))
+    }, 2000)
+}
+
+// add comment different than add commentS
+export const addComment = newcomment => ({
+    type: ActionTypes.ADD_COMMENT,
+    payload: newcomment
 });
 
 export const fetchCampsites = () => dispatch => {
