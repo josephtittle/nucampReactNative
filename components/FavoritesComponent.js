@@ -39,7 +39,7 @@ class Favorites extends Component {
                                 Alert.alert(
                                     'Delete Favorite?', //1st parameter: title 
                                     'Are you sure you wish to delete the favorite campsite ' + item.name + '?', //2nd parameter: dialogue box
-                                    // 3rd parameter: set of actions alert needs to support provided as an array of objects
+                                    // 3rd parameter: set alert to support provided as array of objects
                                     // each item in array represents a button
                                     [
                                         {
